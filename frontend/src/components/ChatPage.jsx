@@ -90,12 +90,13 @@ function ChatPage() {
     pcRef.current = new RTCPeerConnection({
       iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
-        // { urls: 'stun:stun1.l.google.com:19302' } // Add backup STUN server
+        { urls: 'stun:stun1.l.google.com:19302' } // Add backup STUN server
       ]
     });
 
     pcRef.current.onicecandidate = (event) => {
       if (event.candidate) {
+        console.log('Sending ICE candidate:', event.candidate);
         socketRef.current.emit('signal', {
           to: partnerId,
           data: { candidate: event.candidate }
@@ -104,17 +105,21 @@ function ChatPage() {
     };
 
     pcRef.current.ontrack = (event) => {
-      console.log('Received remote audio stream'); // ← Add logging
+      console.log('Received remote audio stream');
       if (remoteAudioRef.current) {
         remoteAudioRef.current.srcObject = event.streams[0];
+        // Force play the audio
+        remoteAudioRef.current.play().catch(e => {
+          console.log('Autoplay prevented:', e);
+        });
       } else {
         pendingStreamRef.current = event.streams[0];
       }
     };
 
-    // BOTH users need to get their microphone stream
+    // Get microphone stream FIRST
     try {
-      console.log('Getting user media...'); // ← Add logging
+      console.log('Getting user media...');
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           echoCancellation: true,
@@ -125,25 +130,41 @@ function ChatPage() {
       });
       localStreamRef.current = stream;
       
-      // Add all tracks to the peer connection
+      // Add all tracks to the peer connection BEFORE creating offer/answer
       stream.getTracks().forEach(track => {
-        console.log('Adding local track:', track.kind); // ← Add logging
+        console.log('Adding local track:', track.kind);
         pcRef.current.addTrack(track, stream);
       });
+
+      // Wait for ICE gathering state to be 'complete' or timeout after 3 seconds
+      await new Promise((resolve) => {
+        if (pcRef.current.iceGatheringState === 'complete') {
+          resolve();
+        } else {
+          const timeout = setTimeout(() => resolve(), 3000); // 3 second timeout
+          pcRef.current.addEventListener('icegatheringstatechange', () => {
+            if (pcRef.current.iceGatheringState === 'complete') {
+              clearTimeout(timeout);
+              resolve();
+            }
+          });
+        }
+      });
+
+      // NOW create offer/answer after ICE is configured
+      if (isInitiator) {
+        console.log('Creating offer as initiator');
+        const offer = await pcRef.current.createOffer();
+        await pcRef.current.setLocalDescription(offer);
+        socketRef.current.emit('signal', { to: partnerId, data: offer });
+      } else {
+        console.log('Waiting for offer from partner');
+      }
+      
     } catch (err) {
-      console.error('Microphone access error:', err); // ← Add logging
+      console.error('Microphone access error:', err);
       setStatus('Microphone access denied.');
       return;
-    }
-
-    // Only the initiator creates the offer
-    if (isInitiator) {
-      console.log('Creating offer as initiator'); // ← Add logging
-      const offer = await pcRef.current.createOffer();
-      await pcRef.current.setLocalDescription(offer);
-      socketRef.current.emit('signal', { to: partnerId, data: offer });
-    } else {
-      console.log('Waiting for offer from partner'); // ← Add logging
     }
     
     setCallActive(true);
@@ -187,7 +208,6 @@ function ChatPage() {
         socketRef.current.off('force_disconnect');
       }
     };
-    // eslint-disable-next-line
   }, [navigate]);
 
   useEffect(() => {
@@ -257,7 +277,16 @@ function ChatPage() {
           
           {callActive && (
             <div>
-              <audio ref={remoteAudioRef} autoPlay />
+              <audio 
+                ref={remoteAudioRef} 
+                autoPlay 
+                playsInline
+                // controls // Temporary for debugging
+                onLoadedMetadata={() => console.log('Audio metadata loaded')}
+                onCanPlay={() => console.log('Audio can play')}
+                onPlay={() => console.log('Audio started playing')}
+                onError={(e) => console.log('Audio error:', e)}
+              />
               <div className={styles.talking}>Talking to a stranger...</div>
               <div className={styles.timer}>
                 {String(Math.floor(duration / 60)).padStart(2, '0')}:{String(duration % 60).padStart(2, '0')}
