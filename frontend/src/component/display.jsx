@@ -70,7 +70,7 @@ function Display() {
             case 'video':
                 return (
                     <div key={index} className="content-block video-block">
-                        <div style={{marginRight:"5px"}}>{(index/2)+1}</div>
+                        {/* <div style={{marginRight:"5px"}}>{(index/2)+1}</div> */}
                         <video 
                             controls 
                             
@@ -126,13 +126,16 @@ function Display() {
 
     return (
         <div className="display-container" 
-        // style={{ 
-        //     maxWidth: '400px', 
-        //     margin: '0 auto', 
-        //     padding: '20px', 
-        //     // height: '100%',
-        //     textAlign: 'center',
-        // }}
+        style={{ 
+            maxWidth: '800px', 
+            margin: '0 auto', 
+            // padding: '20px', 
+            textAlign: 'center',
+            backgroundColor: '#f8f9fa',
+            borderRadius: '12px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            color: '#2c3e50'
+        }}
         >
             <div className='topicHeader'>
                 Topic Details
@@ -140,11 +143,11 @@ function Display() {
             
             <div className="topic-details">
                 {/* Topic Title */}
-                <div style={{ borderBottom: '2px solid #ecf0f1', marginBottom:"10px" , marginTop:"10px"}}></div>
+                <div style={{ borderBottom: '2px solid rgb(20, 67, 149)', marginBottom:"10px" , marginTop:"10px"}}></div>
                 <div className='topicName'>
                      {title}
                 </div>
-                <div style={{ borderBottom: '2px solid #ecf0f1', marginBottom:"10px" , marginTop:"10px"}}></div>
+                <div style={{ borderBottom: '2px solid rgb(20, 67, 149)', marginBottom:"10px" , marginTop:"10px"}}></div>
 
 
                 {/* Main Topic Image */}
@@ -153,13 +156,6 @@ function Display() {
                         <img 
                             src={image} 
                             alt={title} 
-                            // style={{
-                            //     width: '100%',
-                            //     maxHeight: '400px',
-                            //     objectFit: 'cover',
-                            //     borderRadius: '12px',
-                            //     boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-                            // }}
                             onError={(e) => {
                                 e.target.style.display = 'none';
                                 console.error('Failed to load main image:', image);
@@ -168,12 +164,10 @@ function Display() {
                     </div>
                 )}
 
-
-                {/* <div style={{background:"white",height:"100px" , widht:"100px" , margin:"10px"}}></div> */}
-
                 <LandingPage/>
 
                 {/* Description Content Blocks */}
+                <div className='reference' >Reference</div>
                 <div className="description-content">
                     {description && description.length > 0 ? (
                         description
