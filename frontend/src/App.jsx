@@ -1,32 +1,47 @@
 import React, { useEffect, useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
-import LandingPage from './components/LandingPage';
-import ChatPage from './components/ChatPage';
-import Header from './components/Header';
-// import Navbar from './components/Navbar';
-import './app.css';
+import { Routes, Route, BrowserRouter as Router, Navigate } from 'react-router-dom';
+import LandingPage from './calling.components/LandingPage';
+import ChatPage from './calling.components/ChatPage';
+import Header from './calling.components/Header';
 
+import './App.css';
+import GL from './component/GL.jsx'
+import Dashboard from './component/dashboard.jsx'
+import Checker from './component/checker.jsx'
+import { GoogleOAuthProvider } from '@react-oauth/google'
+import Display from './component/display.jsx'
+import Upload from './component/upload.jsx'
 
 function App() {
   const [topic, setTopic] = useState('');
 
+  const GoogleAuthWrapper = () => {
+    return (
+      <GoogleOAuthProvider clientId={'297892001189-s1i8r7cs1cq261mvgc4em2feov7rt9jk.apps.googleusercontent.com'}>
+        <GL />
+      </GoogleOAuthProvider>
+    )
+  }
+
   useEffect(() => {
-    fetch('https://correctmebackend.onrender.com/topic')
+    fetch('http://localhost:5000/topic')
       .then(res => res.json())
-      .then(data => setTopic(data.topic));
+      .then(data => setTopic(data.topic))
+      .catch(err => console.error('Failed to fetch topic:', err));
   }, []);
 
   return (
-    <>
-      <div>
-        {/* <Navbar /> */}
-        <Header topic={topic} />
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/chat" element={<ChatPage topic={topic} />} />
-        </Routes>
-      </div>
-    </>
+      <Routes>
+        <Route path='/login' element={<GoogleAuthWrapper/>}/>
+        <Route path='/' element={<Navigate to="/display" replace/>}/>
+        <Route path='/dashboard' element={<Dashboard/>}/>
+        <Route path='/checker' element={<Checker/>}/>
+        <Route path='/display' element={<Display/>}/>
+        <Route path='/upload' element={<Upload/>}/>
+        <Route path="/landing" element={<LandingPage />} />
+        <Route path="/chat" element={<ChatPage topic={topic} />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace/>}/>
+      </Routes>
   )
 }
 
