@@ -11,6 +11,7 @@ import Checker from './component/checker.jsx'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import Display from './component/display.jsx'
 import Upload from './component/upload.jsx'
+import { SocketProvider } from './context/SocketContext';
 
 function App() {
   const [topic, setTopic] = useState('');
@@ -31,6 +32,7 @@ function App() {
   }, []);
 
   return (
+    <SocketProvider>
       <Routes>
         <Route path='/login' element={<GoogleAuthWrapper/>}/>
         <Route path='/' element={<Navigate to="/display" replace/>}/>
@@ -42,6 +44,7 @@ function App() {
         <Route path="/chat" element={<ChatPage topic={topic} />} />
         <Route path="*" element={<Navigate to="/dashboard" replace/>}/>
       </Routes>
+    </SocketProvider>
   )
 }
 

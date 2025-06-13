@@ -106,6 +106,7 @@ io.on('connection', (socket) => {
     // Clean up partners mapping
     delete partners[socket.id];
     delete partners[to];
+    broadcastUserCount();
   });
 
   socket.on('disconnect', () => {

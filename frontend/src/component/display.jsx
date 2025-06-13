@@ -1,12 +1,49 @@
 import React, { useEffect, useState } from 'react';
 import './component.css'; // Assuming you have a CSS file for styling
 import LandingPage from '../calling.components/LandingPage.jsx';
+import { useNavigate } from 'react-router-dom';
+
+
 function Display() {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState([]);
     const [image, setImage] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const navigate = useNavigate();
+
+
+      useEffect(()=>{
+        const fetchData = async () => {
+          try {
+            const response = await fetch('http://localhost:5000/api/topic/getNewestTopic', {
+              method: 'GET',
+              credentials: 'include'
+            });
+    
+            console.log("Response from server:", response);
+            console.log("Response status:", response.status);
+            if (response.status===401) {
+              console.log("you are not logIn");
+              navigate('/login'); 
+              return; // Redirect to login page if not authenticated
+            }
+    
+            // navigate('/upload'); // Navigate to upload page if authenticated
+            const obj = await response.json();
+            console.log('Fetched data:', obj);
+            // navigate('/upload'); // Navigate to upload page after fetching data
+          } catch (error) {
+            console.error('Error fetching data:', error);
+          }
+        };
+    
+        fetchData();
+      },[])
+
+
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -48,7 +85,7 @@ function Display() {
             case 'text':
                 return (
                     <div key={index} className="content-block text-block">
-                        <p>{block.content}</p>
+                        <p style={{textAlign:"left"}}>{block.content}</p>
                     </div>
                 );
 

@@ -1,23 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { io } from 'socket.io-client';
+import { useSocket } from '../context/SocketContext';
 import styles from './LandingPage.module.css'; // Import as styles object
-
-const SIGNAL_SERVER = 'http://localhost:5000';
 
 function LandingPage() {
   const navigate = useNavigate();
   const [liveUsers, setLiveUsers] = useState(0);
+  const socket = useSocket();
 
   useEffect(() => {
-    const socket = io(SIGNAL_SERVER);
-    socket.on('user_count', ({ count }) => {
-      setLiveUsers(count);
-    });
+    if (!socket) return;
+    const handleUserCount = ({ count }) => setLiveUsers(count);
+    socket.on('user_count', handleUserCount);
     return () => {
-      socket.disconnect();
+      socket.off('user_count', handleUserCount);
     };
-  }, []);
+  }, [socket]);
 
   return (
     <div className={styles.container}>

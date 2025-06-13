@@ -22,7 +22,7 @@ function GL() {
                     // console.log("Token:", response.data.token);
                     // const obj = {email, name, picture, token: response.data.token};
                     // localStorage.setItem("userInfo",JSON.stringify(obj));
-                    navigate('/upload'); // Navigate to the upload page after successful login
+                    navigate('/display'); // Navigate to the upload page after successful login
                }
           } catch (err) {
                console.error("Error handling Google login result:", err);

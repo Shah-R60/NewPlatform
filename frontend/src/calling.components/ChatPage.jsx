@@ -1,15 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { io, Socket } from 'socket.io-client';
 import { FaPhoneAlt, FaBolt, FaExclamationTriangle, FaInfoCircle, FaCog } from 'react-icons/fa';
 import styles from './ChatPage.module.css';
-
-const SIGNAL_SERVER = 'http://localhost:5000';
+import { useSocket } from '../context/SocketContext';
 
 function ChatPage() {
   const [status, setStatus] = useState('Connecting to server...');
   const [partnerId, setPartnerId] = useState(null);
   const [callActive, setCallActive] = useState(false);
+  const socket = useSocket();
   const socketRef = useRef();
   const pcRef = useRef();
   const localStreamRef = useRef();
@@ -23,7 +22,8 @@ function ChatPage() {
   const [showSafetyMsg, setShowSafetyMsg] = useState(true);
 
   useEffect(() => {
-    socketRef.current = io(SIGNAL_SERVER);
+    if (!socket) return;
+    socketRef.current = socket;
     socketRef.current.on('connect', () => {
       setMyId(socketRef.current.id);
     });
@@ -73,10 +73,13 @@ function ChatPage() {
 
     return () => {
       cleanup();
-      socketRef.current.disconnect();
+      socketRef.current.off('connect');
+      socketRef.current.off('partner_found');
+      socketRef.current.off('signal');
+      socketRef.current.off('partner_disconnected');
     };
     // eslint-disable-next-line
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     // If a stream was received before the audio element was mounted
