@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './component.css'; // Assuming you have a CSS file for styling
 import LandingPage from '../calling.components/LandingPage.jsx';
 import { useNavigate } from 'react-router-dom';
-
+import Logout from './logout.jsx';
 
 function Display() {
     const [title, setTitle] = useState("");
@@ -220,6 +220,7 @@ function Display() {
                         </p>
                     )}
                 </div>
+                <Logout/>
             </div>
         </div>
     );

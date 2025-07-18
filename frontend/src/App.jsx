@@ -3,6 +3,7 @@ import { Routes, Route, BrowserRouter as Router, Navigate } from 'react-router-d
 import LandingPage from './calling.components/LandingPage';
 import ChatPage from './calling.components/ChatPage';
 import Header from './calling.components/Header';
+import Logout from './component/logout.jsx';
 
 import './App.css';
 import GL from './component/GL.jsx'
@@ -43,6 +44,7 @@ function App() {
         <Route path="/landing" element={<LandingPage />} />
         <Route path="/chat" element={<ChatPage topic={topic} />} />
         <Route path="*" element={<Navigate to="/dashboard" replace/>}/>
+        <Route path = '/logout' element = {<Logout/>}/>
       </Routes>
     </SocketProvider>
   )
