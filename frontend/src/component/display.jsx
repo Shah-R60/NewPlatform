@@ -106,11 +106,16 @@ function Display() {
 
             case 'video':
                 return (
-                    <div key={index} className="content-block video-block">
+                    <div key={index} className="content-block video-block" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
                         {/* <div style={{marginRight:"5px"}}>{(index/2)+1}</div> */}
                         <video 
                             controls 
-                            
+                            style={{ 
+                                maxWidth: '100%', 
+                                height: 'auto',
+                                borderRadius: '8px',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                            }}
                             onError={() => {
                                 console.error('Failed to load video:', block.content);
                             }}
@@ -164,8 +169,8 @@ function Display() {
     return (
         <div className="display-container" 
         style={{ 
-            maxWidth: '800px', 
-            margin: '0 auto', 
+            width: '100%', 
+            margin: '0', 
             // padding: '20px', 
             textAlign: 'center',
             backgroundColor: '#f8f9fa',
