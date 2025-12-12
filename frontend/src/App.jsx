@@ -12,6 +12,7 @@ import Checker from './component/checker.jsx'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import Display from './component/display.jsx'
 import Upload from './component/upload.jsx'
+import AdminTopics from './component/AdminTopics.jsx'
 import { SocketProvider } from './context/SocketContext';
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
         <Route path='/checker' element={<Checker/>}/>
         <Route path='/display' element={<Display/>}/>
         <Route path='/upload' element={<Upload/>}/>
+        <Route path='/admin/topics' element={<AdminTopics/>}/>
         <Route path="/landing" element={<LandingPage />} />
         <Route path="/chat" element={<ChatPage topic={topic} />} />
         <Route path="*" element={<Navigate to="/dashboard" replace/>}/>

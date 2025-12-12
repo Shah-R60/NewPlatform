@@ -25,7 +25,7 @@ router.route("/uploadTopic").post(
 router.route("/getAllTopics").get(verifyJWT,getAllTopics);
 
 // Get newest topic
-router.route("/getNewestTopic").get(verifyJWT,getNewestTopic);
+router.route("/getNewestTopic").get(getNewestTopic);
 
 // Get topic by ID
 router.route("/:id").get(getTopicById);
@@ -41,11 +41,11 @@ router.route("/:id").put(
                name: 'descriptionMedia',
                maxCount: 10
           }
-     ]),
+     ]),verifyJWT,admin,
      updateTopic
 );
 
 // Delete topic
-router.route("/:id").delete(deleteTopic);
+router.route("/:id").delete(verifyJWT,admin,deleteTopic);
 
 export default router;
