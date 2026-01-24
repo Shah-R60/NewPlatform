@@ -155,5 +155,7 @@ app.use('/auth', authRouter); // Use the auth router for authentication routes
 //Routers import
 import userRouter from './routes/user.routes.js'; // Import your user routes
 import topicRouter from './routes/topic.router.js'
+import musicRouter from './routes/music.router.js'
 app.use('/api/users',userRouter);
 app.use('/api/topic',topicRouter);
+app.use('/api/music',musicRouter);
