@@ -79,6 +79,25 @@ function Display() {
         fetchData();
     }, []); // Add empty dependency array
 
+    // Helper function to extract YouTube video ID from URL
+    const getYouTubeVideoId = (url) => {
+        if (!url) return null;
+        
+        // Handle different YouTube URL formats
+        const patterns = [
+            /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+            /youtube\.com\/watch\?.*v=([^&\n?#]+)/
+        ];
+        
+        for (const pattern of patterns) {
+            const match = url.match(pattern);
+            if (match && match[1]) {
+                return match[1];
+            }
+        }
+        return null;
+    };
+
     // Function to render content blocks
     const renderContentBlock = (block, index) => {
         switch (block.type) {
@@ -124,6 +143,54 @@ function Display() {
                             <source src={block.content} type="video/webm" />
                             Your browser does not support the video tag.
                         </video>
+                    </div>
+                );
+
+            case 'youtube':
+                const videoId = getYouTubeVideoId(block.content);
+                if (!videoId) {
+                    return (
+                        <div key={index} className="content-block youtube-block">
+                            <p style={{ color: '#e74c3c', textAlign: 'center' }}>
+                                Invalid YouTube URL
+                            </p>
+                        </div>
+                    );
+                }
+                return (
+                    <div key={index} className="content-block youtube-block" style={{ 
+                        display: 'flex', 
+                        justifyContent: 'center', 
+                        alignItems: 'center', 
+                        width: '100%',
+                        marginBottom: '20px'
+                    }}>
+                        <div style={{
+                            position: 'relative',
+                            paddingBottom: '56.25%', // 16:9 aspect ratio
+                            height: 0,
+                            overflow: 'hidden',
+                            maxWidth: '100%',
+                            width: '100%',
+                            borderRadius: '8px',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                        }}>
+                            <iframe
+                                style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    width: '100%',
+                                    height: '100%',
+                                    borderRadius: '8px'
+                                }}
+                                src={`https://www.youtube.com/embed/${videoId}`}
+                                title={`YouTube video ${index + 1}`}
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                            />
+                        </div>
                     </div>
                 );
 
