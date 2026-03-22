@@ -39,7 +39,7 @@ const publishTopic = asyncHandler(async (req, res) => {
 
     console.log("Uploading main image:", mainImageFile);
     const mainImageUrl = await uploadoncloudinary(mainImageFile);
-    if (!mainImageUrl || !mainImageUrl.url) {
+    if (!mainImageUrl || !mainImageUrl.secure_url) {
         throw new ApiError(500, 'Error uploading main image to cloudinary');
     }
 
@@ -102,13 +102,13 @@ const publishTopic = asyncHandler(async (req, res) => {
                 console.log(`Uploading ${block.type}:`, mediaFile.path);
                 const uploadedMedia = await uploadoncloudinary(mediaFile.path);
                 
-                if (!uploadedMedia || !uploadedMedia.url) {
+                if (!uploadedMedia || !uploadedMedia.secure_url) {
                     throw new ApiError(500, `Error uploading ${block.type} to cloudinary for block ${blockIndex}`);
                 }
 
                 return {
                     type: block.type,
-                    content: uploadedMedia.url, // Store the cloudinary URL
+                    content: uploadedMedia.secure_url.replace("/upload/", "/upload/f_auto,q_auto/"), // Store the cloudinary URL
                     order: block.order || blockIndex
                 };
             }
@@ -123,7 +123,7 @@ const publishTopic = asyncHandler(async (req, res) => {
     // Create topic
     const topic = await Topic.create({
         title: title.trim(),
-        image: mainImageUrl.url,
+        image: mainImageUrl.secure_url.replace("/upload/", "/upload/f_auto,q_auto/"),
         description: processedDescription
     });
 
@@ -206,8 +206,8 @@ const updateTopic = asyncHandler(async (req, res) => {
     // Handle new main image if uploaded
     if (req.files?.TopicImage?.[0]?.path) {
         const newImageUrl = await uploadoncloudinary(req.files.TopicImage[0].path);
-        if (newImageUrl && newImageUrl.url) {
-            topic.image = newImageUrl.url;
+        if (newImageUrl && newImageUrl.secure_url) {
+            topic.image = newImageUrl.secure_url.replace("/upload/", "/upload/f_auto,q_auto/");
         }
     }
 
